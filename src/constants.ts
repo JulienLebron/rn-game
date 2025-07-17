@@ -1,21 +1,8 @@
-export type Point = {
-  x: number;
-  y: number;
-};
+import { Dimensions } from "react-native";
+const width = Dimensions.get("window").width;
 
-export type Circle = Point & {
-  r: number;
-};
-
-export type Square = Point & {
-  w: number;
-};
-
-export type BlockData = Square & {
-  val: number;
-};
-
-export type BallData = Circle & {
-  dx: number;
-  dy: number;
-};
+export const ballRadius = 5;
+export const ballSpeed = 500;
+export const boardHeight = 500;
+export const blocksPerRow = 7;
+export const blockW = width / blocksPerRow - 10;
