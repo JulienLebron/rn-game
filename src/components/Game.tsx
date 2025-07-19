@@ -1,10 +1,60 @@
 import { boardHeight } from "@/constants";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet, Button } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withDecay,
+  withSequence,
+  withRepeat,
+  withDelay,
+} from "react-native-reanimated";
 
 export default function Game() {
+  const x = useSharedValue(200);
+
+  const moveBall = () => {
+    // x.value = withTiming(x.value + 100, { duration: 5000 });
+    // x.value = withSpring(x.value + 100);
+    // x.value = withDecay({ velocity: 300 });
+
+    // shake the ball
+    x.value = withRepeat(
+      withSequence(withTiming(230), withTiming(170), withTiming(200)),
+      -1
+    );
+  };
+
+  const ballStyles = useAnimatedStyle(() => {
+    return {
+      left: x.value,
+    };
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.board}>{/* TODO: Add game elements */}</View>
+      <View style={styles.board}>
+        {/* TODO: Add game elements */}
+
+        <Animated.View
+          style={[
+            {
+              width: 50,
+              height: 50,
+              backgroundColor: "white",
+              borderRadius: 50,
+
+              position: "absolute",
+              top: boardHeight / 2,
+              // left: x,
+            },
+            ballStyles,
+          ]}
+        />
+      </View>
+
+      <Button title="Move" onPress={moveBall} />
     </SafeAreaView>
   );
 }
