@@ -11,6 +11,7 @@ import Animated, {
   withDelay,
   runOnJS,
 } from "react-native-reanimated";
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
 
 export default function Game() {
   const x = useSharedValue(200);
@@ -46,32 +47,42 @@ export default function Game() {
     };
   });
 
-  console.log("rerender");
+  const gesture = Gesture.Pan()
+    .onBegin(() => console.log("begin"))
+    .onStart(() => console.log("start"))
+
+    .onUpdate((e) => {
+      x.value = e.absoluteX;
+    })
+
+    .onEnd(() => console.log("ended"))
+    .onFinalize(() => console.log("finalize"));
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.board}>
-        {/* TODO: Add game elements */}
+    <GestureDetector gesture={gesture}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.board}>
+          {/* TODO: Add game elements */}
 
-        <Animated.View
-          style={[
-            {
-              width: 50,
-              height: 50,
-              backgroundColor: "white",
-              borderRadius: 50,
+          <Animated.View
+            style={[
+              {
+                width: 50,
+                height: 50,
+                backgroundColor: "white",
+                borderRadius: 50,
+                position: "absolute",
+                top: boardHeight / 2,
+                // left: x,
+              },
+              ballStyles,
+            ]}
+          />
+        </View>
 
-              position: "absolute",
-              top: boardHeight / 2,
-              // left: x,
-            },
-            ballStyles,
-          ]}
-        />
-      </View>
-
-      <Button title="Move" onPress={moveBall} />
-    </SafeAreaView>
+        <Button title="Move" onPress={moveBall} />
+      </SafeAreaView>
+    </GestureDetector>
   );
 }
 
