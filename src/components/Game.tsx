@@ -1,4 +1,4 @@
-import { ballRadius, boardHeight } from "@/constants";
+import { ballRadius, blockW, boardHeight } from "@/constants";
 import { BallData, BlockData } from "@/types";
 import {
   SafeAreaView,
@@ -6,8 +6,11 @@ import {
   StyleSheet,
   Button,
   useWindowDimensions,
+  Alert,
+  Text,
 } from "react-native";
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
@@ -17,9 +20,11 @@ import { GameContext } from "@/GameContext";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { generateBlocksRow } from "@/utils";
 import Block from "./Block";
+import { useState } from "react";
 
 export default function Game() {
   const { width } = useWindowDimensions();
+  const [score, setScore] = useState(1);
 
   const ball = useSharedValue<BallData>({
     x: width / 2,
@@ -37,6 +42,27 @@ export default function Game() {
 
   const isUserTurn = useSharedValue(true);
 
+  const incrementScore = () => {
+    setScore((s) => s + 1);
+  };
+
+  const onGameOver = () => {
+    Alert.alert("Game over", "Score: " + score, [
+      {
+        text: "Restart",
+        onPress: () => {
+          blocks.value = [];
+
+          blocks.value = Array(3)
+            .fill(0)
+            .flatMap((_, row) => generateBlocksRow(row + 1));
+
+          setScore(1);
+        },
+      },
+    ]);
+  };
+
   const onEndTurn = () => {
     "worklet";
     if (isUserTurn.value) {
@@ -44,6 +70,28 @@ export default function Game() {
     }
 
     isUserTurn.value = true;
+
+    // check if game is over
+    const gameOver = blocks.value.some(
+      (block) => block.val > 0 && block.y + 2 * (blockW + 10) > boardHeight
+    );
+    if (gameOver) {
+      console.log("game over");
+      runOnJS(onGameOver)();
+      return;
+    }
+
+    blocks.modify((blocks) => {
+      blocks.forEach((block) => {
+        block.y += blockW + 10;
+      });
+
+      blocks.push(...generateBlocksRow(1));
+
+      return blocks;
+    });
+
+    runOnJS(incrementScore)();
   };
 
   const pan = Gesture.Pan()
@@ -89,6 +137,11 @@ export default function Game() {
     <GameContext.Provider value={{ ball, isUserTurn, onEndTurn, blocks }}>
       <GestureDetector gesture={pan}>
         <SafeAreaView style={styles.container}>
+          <View style={{ alignItems: "center" }}>
+            <Text style={{ fontSize: 40, fontWeight: "bold", color: "gray" }}>
+              {score}
+            </Text>
+          </View>
           <View style={styles.board}>
             {/* TODO: Add game elements */}
             {blocks.value.map((block, index) => (
