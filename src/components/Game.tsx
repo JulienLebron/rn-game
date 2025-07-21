@@ -4,22 +4,20 @@ import {
   SafeAreaView,
   View,
   StyleSheet,
-  Button,
   useWindowDimensions,
-  Alert,
   Text,
+  Alert,
 } from "react-native";
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
-
 import Ball from "./Ball";
 import { GameContext } from "@/GameContext";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { generateBlocksRow } from "@/utils";
 import Block from "./Block";
+import { generateBlocksRow } from "@/utils";
 import { useState } from "react";
 
 export default function Game() {
@@ -68,7 +66,6 @@ export default function Game() {
     if (isUserTurn.value) {
       return;
     }
-
     isUserTurn.value = true;
 
     // check if game is over
@@ -147,6 +144,7 @@ export default function Game() {
             {blocks.value.map((block, index) => (
               <Block key={index} index={index} />
             ))}
+
             <Ball />
 
             {/* Ball Trajjectory */}

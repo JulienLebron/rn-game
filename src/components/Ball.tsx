@@ -43,7 +43,6 @@ export default function Ball() {
       dx *= -1;
       x = r;
     }
-
     ball!.value = {
       ...ball!.value,
       x,
